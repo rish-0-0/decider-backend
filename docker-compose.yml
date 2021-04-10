@@ -1,0 +1,42 @@
+version: '3.1'
+services:
+  decider_db:
+    container_name: decider_db 
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    networks: 
+      - decider_network
+    volumes:
+      - '$PWD/data:/var/lib/postgresql/data'
+    restart: always
+  redis:
+    image: redis
+    container_name: redis
+    networks:
+      - decider_network
+    volumes:
+      - $PWD/redis/data:/var/lib/redis
+      - $PWD/redis/redis.conf:/usr/local/etc/redis/redis.conf
+  decider_app:
+    build: ./app
+    working_dir: /usr/src/app
+    environment:
+      PGUSER: ${DATABASE_USER}
+      PGPASSWORD: ${DATABASE_PASSWORD}
+      PGDATABASE: ${DATABASE_NAME}
+      PGPORT: ${DATABASE_PORT}
+      PGHOST: decider_db
+    container_name: decider_app
+    networks:
+      - decider_network
+    depends_on:
+      - decider_db
+      - redis
+    command: mix phx.server
+
+networks:
+  decider_network:

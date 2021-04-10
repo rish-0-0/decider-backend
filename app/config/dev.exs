@@ -1,5 +1,14 @@
 use Mix.Config
 
+# Configure your database
+config :app, App.Repo,
+  username: "rishabh",
+  password: "rishabh",
+  database: "decider",
+  hostname: "decider_db",
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
